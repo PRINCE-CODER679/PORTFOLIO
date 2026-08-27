@@ -72,7 +72,7 @@ export default function Projects() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-3 pt-3 border-t border-[#2A835F]/30">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-3 border-t border-[#2A835F]/30">
                 {(project.liveUrl || project.githubUrl || project.repoUrl) && (
                   <>
                     <a

@@ -37,7 +37,7 @@ export default function Experience() {
               <span className="absolute -left-[31px] sm:-left-[47px] top-1.5 w-5 h-5 rounded-full bg-[#060d14] border-4 border-[#34D399] group-hover:border-[#FF5A79] group-hover:scale-125 transition-all shadow-md" />
 
               {/* Card Container */}
-              <div className="p-7 rounded-3xl border border-[#2A835F]/40 bg-[#0c1824]/90 backdrop-blur-xl shadow-xl hover:border-[#34D399]/60 hover:shadow-2xl transition-all duration-300 space-y-4">
+              <div className="p-5 sm:p-7 rounded-3xl border border-[#2A835F]/40 bg-[#0c1824]/90 backdrop-blur-xl shadow-xl hover:border-[#34D399]/60 hover:shadow-2xl transition-all duration-300 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <h3 className="text-xl font-extrabold text-white group-hover:text-[#34D399] transition-colors">

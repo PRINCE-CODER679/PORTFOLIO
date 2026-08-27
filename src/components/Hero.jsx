@@ -39,8 +39,8 @@ export default function Hero() {
             BUILD INTELLIGENT AI & FULL-STACK SYSTEMS
           </motion.div>
 
-          {/* Main Headline - Attractive & Creative Gradient Highlight Typography */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.4rem] font-black leading-[1.08] tracking-tight text-white drop-shadow-[0_4px_35px_rgba(0,0,0,0.95)] max-w-5xl">
+          {/* Main Headline - Responsive Typography */}
+          <h1 className="text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.4rem] font-black leading-[1.1] sm:leading-[1.08] tracking-tight text-white drop-shadow-[0_4px_35px_rgba(0,0,0,0.95)] max-w-5xl">
             A new way to{' '}
             <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#38BDF8] via-[#818CF8] to-[#C084FC] drop-shadow-[0_0_35px_rgba(56,189,248,0.6)]">
               think

@@ -88,16 +88,16 @@ export default function Navbar() {
         id="mobile-menu"
         className={[
           'md:hidden overflow-hidden transition-all duration-300 ease-in-out',
-          isOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0',
+          isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0',
         ].join(' ')}
       >
-        <div className="border-t border-[#87727d]/30 px-4 pt-3 pb-4 space-y-1 bg-[#1c1519]/95">
+        <div className="border-t border-[#2A835F]/40 px-6 pt-4 pb-5 space-y-2 bg-[#060d14]/98 backdrop-blur-2xl shadow-2xl">
           {navLinks.map(({ label, href }) => (
             <a
               key={href}
               href={href}
               onClick={handleLinkClick}
-              className="block px-3 py-2.5 rounded-lg text-[0.9rem] font-bold text-[#bcb2ba] transition-colors duration-200 hover:text-[#ead5d0] hover:bg-white/5"
+              className="block px-4 py-3 rounded-xl text-base font-extrabold text-slate-200 transition-colors duration-200 hover:text-[#34D399] hover:bg-white/10"
             >
               {label}
             </a>
@@ -106,7 +106,7 @@ export default function Navbar() {
             <a
               href="#contact"
               onClick={handleLinkClick}
-              className="block w-full text-center px-4 py-2.5 text-[0.85rem] font-extrabold tracking-wide text-white rounded-lg bg-gradient-to-r from-[#624f59] via-[#87727d] to-[#936789] transition-all duration-200 shadow-md"
+              className="block w-full text-center px-5 py-3 text-sm font-black tracking-wider uppercase text-white rounded-xl bg-gradient-to-r from-[#D81B60] to-[#FF5A79] shadow-lg transition-all duration-200 border border-[#FF5A79]/40"
             >
               Let's Connect
             </a>
