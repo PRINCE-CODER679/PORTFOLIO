@@ -11,66 +11,82 @@ export function VantaBackground({ className = "" }) {
 
     // 1. Scene, Camera, Renderer
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030712, 0.018);
+    scene.fog = new THREE.FogExp2(0x030712, 0.015);
 
     const camera = new THREE.PerspectiveCamera(
-      55,
+      60,
       container.clientWidth / container.clientHeight,
       0.1,
       1000
     );
-    camera.position.set(0, 18, 35);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(0, 0, 32);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // 2. Geometry: 3D Wave Plane
-    const geometry = new THREE.PlaneGeometry(100, 100, 60, 60);
-    geometry.rotateX(-Math.PI / 2.3);
+    // 2. Vanta NET Data: Particle Nodes
+    const particleCount = 90;
+    const maxDistance = 14;
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = [];
 
-    const pos = geometry.attributes.position;
+    // Initialize 3D positions and random velocity directions
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 50;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 35;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 35;
 
-    // Material 1: Solid Shaded 3D Mesh
-    const material = new THREE.MeshPhongMaterial({
-      color: 0x2563eb, // Vibrant Royal Indigo #2563EB / #3B82F6
-      emissive: 0x0f172a,
-      flatShading: true,
-      shininess: 90,
+      velocities.push({
+        x: (Math.random() - 0.5) * 0.08,
+        y: (Math.random() - 0.5) * 0.08,
+        z: (Math.random() - 0.5) * 0.08,
+      });
+    }
+
+    // 3. Node Points (Particles)
+    const pointsGeometry = new THREE.BufferGeometry();
+    pointsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const pointsMaterial = new THREE.PointsMaterial({
+      color: 0x34d399,
+      size: 0.8,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.9,
     });
 
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.y = -5;
-    scene.add(mesh);
+    const pointsMesh = new THREE.Points(pointsGeometry, pointsMaterial);
+    scene.add(pointsMesh);
 
-    // Material 2: Glowing Cyber Wireframe Overlay
-    const wireframeMat = new THREE.MeshBasicMaterial({
-      color: 0x60a5fa, // Bright Cyan Highlight #60A5FA
-      wireframe: true,
+    // 4. Connecting Lines (Net Geometry)
+    const linesGeometry = new THREE.BufferGeometry();
+    const maxLines = (particleCount * (particleCount - 1)) / 2;
+    const linePositions = new Float32Array(maxLines * 6);
+    const lineColors = new Float32Array(maxLines * 6);
+
+    linesGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+    linesGeometry.setAttribute('color', new THREE.BufferAttribute(lineColors, 3));
+
+    const linesMaterial = new THREE.LineBasicMaterial({
+      vertexColors: true,
       transparent: true,
-      opacity: 0.25,
+      opacity: 0.45,
+      blending: THREE.AdditiveBlending,
     });
-    const wireframeMesh = new THREE.Mesh(geometry, wireframeMat);
-    wireframeMesh.position.y = -4.9;
-    scene.add(wireframeMesh);
 
-    // 3. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
+    scene.add(linesMesh);
+
+    // 5. Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    const light1 = new THREE.PointLight(0x3b82f6, 4, 120);
-    light1.position.set(20, 30, 20);
-    scene.add(light1);
+    const pointLight = new THREE.PointLight(0x3b82f6, 3, 100);
+    pointLight.position.set(0, 0, 20);
+    scene.add(pointLight);
 
-    const light2 = new THREE.PointLight(0x818cf8, 3, 120);
-    light2.position.set(-20, 20, -10);
-    scene.add(light2);
-
-    // 4. Mouse Interactive Parallax
+    // 6. Interactive Mouse Physics
     let mouseX = 0;
     let mouseY = 0;
     const handleMouseMove = (e) => {
@@ -79,26 +95,75 @@ export function VantaBackground({ className = "" }) {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    // 5. Animation Loop
-    const clock = new THREE.Clock();
+    // 7. Animation Loop
     let animId;
-
     const animate = () => {
-      const time = clock.getElapsedTime() * 1.1;
+      let vertexIdx = 0;
+      let colorIdx = 0;
 
-      // Deform Vertices in Real-Time 3D Wave Motion
-      for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i);
-        const y = pos.getY(i);
-        const z = Math.sin(x * 0.12 + time) * 3.2 + Math.cos(y * 0.12 + time * 0.9) * 3.2;
-        pos.setZ(i, z);
+      // Update node positions with velocity and boundary bounce
+      for (let i = 0; i < particleCount; i++) {
+        let x = positions[i * 3] + velocities[i].x;
+        let y = positions[i * 3 + 1] + velocities[i].y;
+        let z = positions[i * 3 + 2] + velocities[i].z;
+
+        // Bounce back from boundaries
+        if (x < -30 || x > 30) velocities[i].x *= -1;
+        if (y < -22 || y > 22) velocities[i].y *= -1;
+        if (z < -22 || z > 22) velocities[i].z *= -1;
+
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
       }
-      pos.needsUpdate = true;
-      geometry.computeVertexNormals();
+      pointsGeometry.attributes.position.needsUpdate = true;
 
-      // Smooth Camera Sway with Mouse Movement
-      camera.position.x += (mouseX * 6 - camera.position.x) * 0.04;
-      camera.position.y += (-mouseY * 4 + 18 - camera.position.y) * 0.04;
+      // Build Vanta Net connecting lines between near nodes
+      for (let i = 0; i < particleCount; i++) {
+        const x1 = positions[i * 3];
+        const y1 = positions[i * 3 + 1];
+        const z1 = positions[i * 3 + 2];
+
+        for (let j = i + 1; j < particleCount; j++) {
+          const x2 = positions[j * 3];
+          const y2 = positions[j * 3 + 1];
+          const z2 = positions[j * 3 + 2];
+
+          const dx = x1 - x2;
+          const dy = y1 - y2;
+          const dz = z1 - z2;
+          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+          if (dist < maxDistance) {
+            const alpha = (1 - dist / maxDistance) * 0.8;
+
+            linePositions[vertexIdx++] = x1;
+            linePositions[vertexIdx++] = y1;
+            linePositions[vertexIdx++] = z1;
+
+            linePositions[vertexIdx++] = x2;
+            linePositions[vertexIdx++] = y2;
+            linePositions[vertexIdx++] = z2;
+
+            // Electric Indigo & Cyan Line Gradient (#3B82F6 & #34D399)
+            lineColors[colorIdx++] = 0.23 * alpha;
+            lineColors[colorIdx++] = 0.83 * alpha;
+            lineColors[colorIdx++] = 0.96 * alpha;
+
+            lineColors[colorIdx++] = 0.23 * alpha;
+            lineColors[colorIdx++] = 0.51 * alpha;
+            lineColors[colorIdx++] = 0.96 * alpha;
+          }
+        }
+      }
+
+      linesGeometry.setDrawRange(0, vertexIdx / 3);
+      linesGeometry.attributes.position.needsUpdate = true;
+      linesGeometry.attributes.color.needsUpdate = true;
+
+      // Parallax Sway
+      camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
+      camera.position.y += (-mouseY * 4 - camera.position.y) * 0.05;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
@@ -107,7 +172,7 @@ export function VantaBackground({ className = "" }) {
 
     animate();
 
-    // 6. Responsive Resize Handler
+    // 8. Responsive Resize Handler
     const handleResize = () => {
       if (!container) return;
       const w = container.clientWidth;
@@ -126,9 +191,10 @@ export function VantaBackground({ className = "" }) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
       }
       renderer.dispose();
-      geometry.dispose();
-      material.dispose();
-      wireframeMat.dispose();
+      pointsGeometry.dispose();
+      pointsMaterial.dispose();
+      linesGeometry.dispose();
+      linesMaterial.dispose();
     };
   }, []);
 
